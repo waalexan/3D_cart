@@ -1,13 +1,15 @@
-'use client';
+'use client'; // << ESSENCIAL para marcar este componente como Client Component
 
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 export default function ThreeScene() {
-  const mountRef = useRef(null);
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!mountRef.current) return;
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -26,7 +28,7 @@ export default function ThreeScene() {
 
     const loader = new GLTFLoader();
     loader.load(
-      '/models/scene.gltf', // Arquivo na pasta public/
+      '/models/scene.gltf',
       (gltf) => {
         scene.add(gltf.scene);
         animate();
@@ -42,12 +44,11 @@ export default function ThreeScene() {
       renderer.render(scene, camera);
     }
 
-    // Cleanup
     return () => {
       renderer.dispose();
-      mountRef.current.innerHTML = '';
+      mountRef.current?.removeChild(renderer.domElement);
     };
   }, []);
 
-  return <div ref={mountRef} />;
+  return <div ref={mountRef} style={{ width: '100vw', height: '100vh' }} />;
 }
